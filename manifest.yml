@@ -1,0 +1,6 @@
+---
+applications:
+  - name: sc-connectors-demo
+    random-route: true
+    memory: 1G
+    path: ./build/libs/sc-connectors-demo.jar
