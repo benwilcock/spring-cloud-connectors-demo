@@ -1,0 +1,64 @@
+buildscript {
+	ext {
+		springBootVersion = '1.4.0.RELEASE'
+        springCloudConnectorsVersion = '1.2.3.RELEASE'
+	}
+	repositories {
+		mavenCentral()
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+	}
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'spring-boot'
+
+jar {
+	baseName = 'sc-connectors-demo'
+	version = ""
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+	mavenCentral()
+}
+
+
+dependencies {
+	compile "org.springframework.boot:spring-boot-starter-actuator:${springBootVersion}"
+    compile "org.springframework.boot:spring-boot-starter-data-jpa:${springBootVersion}"
+	compile "org.springframework.boot:spring-boot-starter-data-rest:${springBootVersion}"
+	compile "org.springframework.boot:spring-boot-starter-web:${springBootVersion}"
+	testCompile"org.springframework.boot:spring-boot-starter-test:${springBootVersion}"
+
+    // Spring Cloud Connectors
+    compile "org.springframework.cloud:spring-cloud-spring-service-connector:${springCloudConnectorsVersion}"
+    compile "org.springframework.cloud:spring-cloud-localconfig-connector:${springCloudConnectorsVersion}"
+    compile "org.springframework.cloud:spring-cloud-cloudfoundry-connector:${springCloudConnectorsVersion}"
+
+	// JPA Persistence
+	runtime "mysql:mysql-connector-java"
+
+	// Messaging
+	compile "org.springframework.boot:spring-boot-starter-amqp:${springBootVersion}"
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:Brixton.SR5"
+	}
+}
+
+bootRun {
+	jvmArgs = [
+            "-Dspring.cloud.appId=sc-connectors-demo",
+            "-Dspring.profiles.active=cloud",
+            "-Dspring.cloud.database=mysql://user:pass@localhost:3306/test_db",
+            "-Dspring.cloud.rabbitmq=amqp://user:pass@localhost:5672/test_vhost",
+    ]
+
+}

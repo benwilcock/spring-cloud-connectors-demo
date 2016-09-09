@@ -1,0 +1,11 @@
+---
+applications:
+- name: sc-connectors-demo
+  path: build/libs/sc-connectors-demo.jar
+  instances: 1
+  memory: 1024M
+  disk_quota: 1024M
+  random-route: true
+  services:
+    - mysql
+    - rabbit
