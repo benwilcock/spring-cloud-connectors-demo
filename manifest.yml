@@ -1,6 +1,7 @@
 ---
 applications:
 - name: sc-connectors-demo
+  buildpack: https://github.com/cloudfoundry/java-buildpack.git
   path: build/libs/sc-connectors-demo.jar
   instances: 1
   memory: 1024M
