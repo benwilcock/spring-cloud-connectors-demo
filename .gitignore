@@ -1,6 +1,6 @@
 # Folders
 /build
-/.DS_Store
+**/.DS_Store
 .gradle
 .idea
 /unused
