@@ -26,6 +26,7 @@ public class CustomInfoEndpointAdditions {
         props.put("info.id", status.getId());
         props.put("info.sql", status.getSql());
         props.put("info.rabbit", status.getRabbit());
+        props.put("info.mongodb", status.getMongo());
 
         // Set the new properties into the environment
         env.getPropertySources().addFirst(new PropertiesPropertySource("extra-info-props", props));

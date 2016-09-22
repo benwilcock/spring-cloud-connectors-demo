@@ -1,6 +1,6 @@
 buildscript {
 	ext {
-		springBootVersion = '1.4.0.RELEASE'
+		springBootVersion = '1.4.1.RELEASE'
         springCloudConnectorsVersion = '1.2.3.RELEASE'
 	}
 	repositories {
@@ -32,6 +32,7 @@ dependencies {
 	compile "org.springframework.boot:spring-boot-starter-actuator:${springBootVersion}"
     compile "org.springframework.boot:spring-boot-starter-data-jpa:${springBootVersion}"
 	compile "org.springframework.boot:spring-boot-starter-data-rest:${springBootVersion}"
+	compile "org.springframework.boot:spring-boot-starter-data-mongodb:${springBootVersion}"
 	compile "org.springframework.boot:spring-boot-starter-web:${springBootVersion}"
 	testCompile"org.springframework.boot:spring-boot-starter-test:${springBootVersion}"
 
@@ -58,6 +59,7 @@ bootRun {
             "-Dspring.cloud.appId=sc-connectors-demo",
 			"-Dspring.profiles.active=cloud",
             "-Dspring.cloud.database=mysql://user:pass@localhost:3306/test_db",
-            "-Dspring.cloud.rabbitmq=amqp://user:pass@localhost:5672/test_vhost"
+            "-Dspring.cloud.rabbitmq=amqp://user:pass@localhost:5672/test_vhost",
+            "-Dspring.cloud.mongodb=mongodb://localhost:27017/test_db"
     ]
 }

@@ -1,7 +1,8 @@
 ---
 applications:
-- name: sc-connectors-demo
-  buildpack: https://github.com/cloudfoundry/java-buildpack.git
+- name: sccd
+  # buildpack: https://github.com/cloudfoundry/java-buildpack.git
+  buildpack: java_buildpack
   path: build/libs/sc-connectors-demo.jar
   instances: 1
   memory: 1024M
@@ -10,3 +11,4 @@ applications:
   services:
     - mysql
     - rabbit
+    - mongodb

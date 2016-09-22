@@ -20,3 +20,8 @@ services:
      - RABBITMQ_DEFAULT_USER=user
      - RABBITMQ_DEFAULT_PASS=pass
      - RABBITMQ_DEFAULT_VHOST=test_vhost
+  mongodb:
+    image: mongo:2.4
+    container_name: mongodb
+    ports:
+     - "27017:27017"

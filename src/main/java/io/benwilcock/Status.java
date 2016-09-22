@@ -2,6 +2,9 @@ package io.benwilcock;
 
 import org.springframework.amqp.AmqpConnectException;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.MongoDbFactory;
+import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
 
 import javax.sql.DataSource;
@@ -12,49 +15,22 @@ import java.util.UUID;
 /**
  * Created by benwilcock on 04/08/2016.
  */
+
+@Component
 public class Status {
 
-    private String id = UUID.randomUUID().toString();
-    private String sql;
-    private String rabbit;
+    @Autowired
+    DataSource dataSource;
 
-    public Status(DataSource dataSource, ConnectionFactory rabbitCf) {
+    @Autowired
+    ConnectionFactory rabbitConnectionFactory;
 
-        if (dataSource == null) {
-            this.sql = "<null>";
-        } else {
-            try {
-                Field urlField = ReflectionUtils.findField(dataSource.getClass(), "url");
-                ReflectionUtils.makeAccessible(urlField);
-                this.sql = (String) urlField.get(dataSource);
-            } catch (Exception fe) {
-                try {
-                    Method urlMethod = ReflectionUtils.findMethod(dataSource.getClass(), "getUrl");
-                    ReflectionUtils.makeAccessible(urlMethod);
-                    this.sql = (String) urlMethod.invoke(dataSource, (Object[])null);
-                } catch (Exception me){
-                    this.sql = "<unknown> " + dataSource.getClass();
-                }
-            }
-        }
+    @Autowired
+    MongoDbFactory mongoDbFactory;
 
+    private static final String id = UUID.randomUUID().toString();
 
-        if(rabbitCf == null){
-            this.rabbit = "<null>";
-        } else {
-            StringBuilder sb = new StringBuilder(rabbitCf.getHost());
-            sb.append(":");
-            sb.append(rabbitCf.getPort());
-
-            try {
-                rabbitCf.createConnection().isOpen();
-                sb.append(":UP");
-            } catch (AmqpConnectException ce){
-                sb.append(":DOWN - ");
-                sb.append(ce.getCause().getMessage());
-            }
-            this.rabbit = sb.toString();
-        }
+    public Status() {
     }
 
     public String getId() {
@@ -62,10 +38,79 @@ public class Status {
     }
 
     public String getSql() {
+        String sql;
+
+        if (dataSource == null) {
+            sql = "<null>";
+        } else {
+            try {
+                Field urlField = ReflectionUtils.findField(dataSource.getClass(), "url");
+                ReflectionUtils.makeAccessible(urlField);
+                sql = (String) urlField.get(dataSource);
+            } catch (Exception fe) {
+                try {
+                    Method urlMethod = ReflectionUtils.findMethod(dataSource.getClass(), "getUrl");
+                    ReflectionUtils.makeAccessible(urlMethod);
+                    sql = (String) urlMethod.invoke(dataSource, (Object[])null);
+                } catch (Exception me){
+                    sql = "<unknown> " + dataSource.getClass();
+                }
+            }
+        }
         return sql;
     }
 
+    public boolean isSql(){
+        return (null == dataSource);
+    }
+
     public String getRabbit() {
-        return rabbit;
+        StringBuilder sb = new StringBuilder();
+
+        if(rabbitConnectionFactory == null){
+            sb.append("<null>");
+        } else {
+            sb.append(rabbitConnectionFactory.getHost());
+            sb.append(":");
+            sb.append(rabbitConnectionFactory.getPort());
+
+            try {
+                rabbitConnectionFactory.createConnection().isOpen();
+                sb.append(":UP");
+            } catch (AmqpConnectException ce){
+                sb.append(":DOWN - ");
+                sb.append(ce.getCause().getMessage());
+            }
+        }
+        return sb.toString();
+    }
+
+    public boolean isRabbit(){
+        return (null == rabbitConnectionFactory);
+    }
+
+    public String getMongo(){
+        StringBuilder sb = new StringBuilder();
+
+        if(mongoDbFactory == null){
+            sb.append("<null>");
+        } else {
+            sb.append(mongoDbFactory.getDb().getMongo().getAddress());
+        }
+        return sb.toString();
+    }
+
+    public boolean isMongo(){
+        return (null == mongoDbFactory);
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(getSql());
+        sb.append("/n");
+        sb.append(getRabbit());
+        sb.append("/n");
+        return "";
     }
 }
