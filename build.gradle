@@ -54,12 +54,18 @@ dependencyManagement {
 	}
 }
 
+def JvmSettings = [
+        "-Dspring.cloud.appId=sc-connectors-demo",
+        "-Dspring.profiles.active=cloud",
+        "-Dspring.cloud.database=mysql://user:pass@localhost:3306/test_db",
+        "-Dspring.cloud.rabbitmq=amqp://user:pass@localhost:5672/test_vhost",
+        "-Dspring.cloud.mongodb=mongodb://localhost:27017/test_db"
+]
+
+test {
+    jvmArgs = JvmSettings
+}
+
 bootRun {
-	jvmArgs = [
-            "-Dspring.cloud.appId=sc-connectors-demo",
-			"-Dspring.profiles.active=cloud",
-            "-Dspring.cloud.database=mysql://user:pass@localhost:3306/test_db",
-            "-Dspring.cloud.rabbitmq=amqp://user:pass@localhost:5672/test_vhost",
-            "-Dspring.cloud.mongodb=mongodb://localhost:27017/test_db"
-    ]
+	jvmArgs = JvmSettings
 }

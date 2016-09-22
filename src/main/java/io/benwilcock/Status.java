@@ -19,16 +19,14 @@ import java.util.UUID;
 @Component
 public class Status {
 
+    private static final String id = UUID.randomUUID().toString();
+
     @Autowired
     DataSource dataSource;
-
     @Autowired
     ConnectionFactory rabbitConnectionFactory;
-
     @Autowired
     MongoDbFactory mongoDbFactory;
-
-    private static final String id = UUID.randomUUID().toString();
 
     public Status() {
     }
@@ -38,37 +36,36 @@ public class Status {
     }
 
     public String getSql() {
-        String sql;
+        StringBuilder sb = new StringBuilder();
 
         if (dataSource == null) {
-            sql = "<null>";
+            sb.append("NULL");
         } else {
             try {
                 Field urlField = ReflectionUtils.findField(dataSource.getClass(), "url");
                 ReflectionUtils.makeAccessible(urlField);
-                sql = (String) urlField.get(dataSource);
+                sb.append(urlField.get(dataSource));
+                sb.append(":UP");
             } catch (Exception fe) {
                 try {
                     Method urlMethod = ReflectionUtils.findMethod(dataSource.getClass(), "getUrl");
                     ReflectionUtils.makeAccessible(urlMethod);
-                    sql = (String) urlMethod.invoke(dataSource, (Object[])null);
-                } catch (Exception me){
-                    sql = "<unknown> " + dataSource.getClass();
+                    sb.append(urlMethod.invoke(dataSource, (Object[]) null));
+                    sb.append(":UP");
+                } catch (Exception me) {
+                    sb.append(":DOWN - ");
+                    sb.append(me.getCause().getMessage());
                 }
             }
         }
-        return sql;
-    }
-
-    public boolean isSql(){
-        return (null == dataSource);
+        return sb.toString();
     }
 
     public String getRabbit() {
         StringBuilder sb = new StringBuilder();
 
-        if(rabbitConnectionFactory == null){
-            sb.append("<null>");
+        if (rabbitConnectionFactory == null) {
+            sb.append("NULL");
         } else {
             sb.append(rabbitConnectionFactory.getHost());
             sb.append(":");
@@ -77,7 +74,7 @@ public class Status {
             try {
                 rabbitConnectionFactory.createConnection().isOpen();
                 sb.append(":UP");
-            } catch (AmqpConnectException ce){
+            } catch (AmqpConnectException ce) {
                 sb.append(":DOWN - ");
                 sb.append(ce.getCause().getMessage());
             }
@@ -85,32 +82,45 @@ public class Status {
         return sb.toString();
     }
 
-    public boolean isRabbit(){
-        return (null == rabbitConnectionFactory);
-    }
-
-    public String getMongo(){
+    public String getMongo() {
         StringBuilder sb = new StringBuilder();
 
-        if(mongoDbFactory == null){
-            sb.append("<null>");
+        if (mongoDbFactory == null) {
+            sb.append("NULL");
         } else {
-            sb.append(mongoDbFactory.getDb().getMongo().getAddress());
+            try {
+                sb.append(mongoDbFactory.getDb().getMongo().getAddress());
+                sb.append(":UP");
+            } catch (Exception ex) {
+                sb.append(":DOWN - ");
+                sb.append(ex.getCause().getMessage());
+            }
         }
         return sb.toString();
     }
 
-    public boolean isMongo(){
-        return (null == mongoDbFactory);
+    public boolean isMongo() {
+        return !(null == mongoDbFactory);
+    }
+
+    public boolean isSql() {
+        return !(null == dataSource);
+    }
+
+    public boolean isRabbit() {
+        return !(null == rabbitConnectionFactory);
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
+        sb.append("SQL: [");
         sb.append(getSql());
-        sb.append("/n");
+        sb.append("] RABBIT: [");
         sb.append(getRabbit());
-        sb.append("/n");
-        return "";
+        sb.append("] MONGO: [");
+        sb.append(getMongo());
+        sb.append("]");
+        return sb.toString();
     }
 }
