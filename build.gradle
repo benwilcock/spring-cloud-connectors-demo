@@ -55,7 +55,7 @@ dependencyManagement {
 }
 
 def JvmSettings = [
-        "-Dspring.cloud.appId=sc-connectors-demo",
+        "-Dspring.cloud.appId=sccd",
         "-Dspring.profiles.active=cloud",
         "-Dspring.cloud.database=mysql://user:pass@localhost:3306/test_db",
         "-Dspring.cloud.rabbitmq=amqp://user:pass@localhost:5672/test_vhost",

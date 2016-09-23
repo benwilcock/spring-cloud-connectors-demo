@@ -10,6 +10,7 @@ import java.util.Properties;
 
 /**
  * Created by benwilcock on 04/08/2016.
+ * This is the method we currently use to add information to the /info endpoint in Actuator.
  */
 @Configuration
 public class CustomInfoEndpointAdditions {
@@ -17,7 +18,7 @@ public class CustomInfoEndpointAdditions {
     @Autowired
     Status status;
 
-    /** These properties will show up in the Spring Boot Actuator /info endpoint **/
+    /** These properties will show up in Spring Boot Actuator's /info endpoint **/
     @Autowired
     public void setInfoProperties(ConfigurableEnvironment env) {
 
